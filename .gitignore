@@ -6,3 +6,5 @@ terraform.tfstate.backup
 *.tfstate.d
 *.tfstate.backup
 **/.terraform.lock.hcl
+**.drawio
+**.odt
