@@ -10,3 +10,10 @@ output "public-alb-dns" {
   value = aws_lb.web-ealb.dns_name
 }
 
+output "private-alb-dns" {
+  value = aws_lb.web-enlb.dns_name
+}
+
+output "private-alb-zone-id" {
+  value = aws_lb.web-enlb.zone_id
+}
