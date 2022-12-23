@@ -11,7 +11,7 @@ resource "aws_launch_configuration" "as_conf" {
 }
 
 resource "aws_autoscaling_group" "bar" {
-  name_prefix               = var.asg_name
+  name                      = var.asg_name
   launch_configuration      = aws_launch_configuration.as_conf.name
   min_size                  = var.min-size
   desired_capacity          = var.desired_capacity

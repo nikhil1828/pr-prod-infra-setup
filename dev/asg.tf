@@ -29,9 +29,7 @@ module "asg2" {
   desired_capacity = var.desired_capacity
   user_data = <<-EOF
   #!/bin/bash
-  /opt/apache-tomcat-8.5.84/bin/startup.sh
-  sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config
-  
+  /opt/apache-tomcat-8.5.84/bin/startup.sh  
   EOF
   snet = [lookup(module.vpc.pvt_snetid,"snet-pvt-1",null).id, lookup(module.vpc.pvt_snetid,"snet-pvt-2",null).id]
   tg-arn = module.lb.tg2-arn

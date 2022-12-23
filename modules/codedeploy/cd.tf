@@ -1,6 +1,6 @@
 # Create the CodeDeploy application
 resource "aws_codedeploy_app" "my_app" {
-  name = "my_app"
+  name = "my_application"
 }
 
 # Create the CodeDeploy deployment group
@@ -12,7 +12,7 @@ resource "aws_codedeploy_deployment_group" "my_deployment_group" {
 
   deployment_style {
     deployment_type = "IN_PLACE"
-    deployment_option = "WITH_TRAFFIC_CONTROL"
+    # deployment_option = "WITH_TRAFFIC_CONTROL"
   }
 
 #   trigger_configuration {

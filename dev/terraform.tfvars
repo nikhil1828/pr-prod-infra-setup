@@ -53,8 +53,8 @@ action-type = "forward"
 
 lc_name          = "nginx_config"
 lc_name-2        = "tomcat_config"
-image_id         = "ami-014018e5f3546dae8" //nginx-image
-image_id-2       = "ami-0c9a52690acf91d95" //tomcat-image
+image_id-2       = "ami-059cd9a8aab0c0b9c" //nginx-image
+image_id         = "ami-0c9a52690acf91d95" //tomcat-image
 instance_type    = "t2.micro"
 key_name         = "mumbai-key"
 asg_name         = "nginx-asg"
