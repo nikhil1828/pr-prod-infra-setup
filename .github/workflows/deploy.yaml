@@ -41,11 +41,11 @@ jobs:
         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
 
   job2:
-    steps:
+    runs-on: ubuntu-latest
     env:
       KEY: ${{ secrets.KEY }}
-    runs-on: ubuntu-latest
     needs: job1
+    steps:
       - name: copy artifacts to instance via ssh key
         uses: appleboy/scp-action@master
         with:
