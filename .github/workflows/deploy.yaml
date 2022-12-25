@@ -28,7 +28,7 @@ jobs:
           instance_id=$(aws ec2 run-instances --image-id ami-0c9a52690acf91d95 --key-name mumbai-key --instance-type t2.micro --query 'Instances[*].[InstanceId]' --output text)
           instance_public_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)
           echo $instance_public_ip
-          sleep 60
+          sleep 90
       
       - name: Pull artifacts from S3 bucket
         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
