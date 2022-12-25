@@ -35,7 +35,7 @@ jobs:
       - name: Store instance-ip in variable
         id: instance-ip
         run: >-
-          echo "::set-output name=ec2-ip::$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)"
+          echo "::set-output name=ec2-ip::$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[].[PublicIpAddress]'  --output text)"
       
       - name: Pull artifacts from S3 bucket
         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
