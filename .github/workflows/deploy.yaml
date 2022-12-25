@@ -27,29 +27,30 @@ jobs:
         run: | 
           instance_id=$(aws ec2 run-instances --image-id ami-0c9a52690acf91d95 --key-name mumbai-key --instance-type t2.micro --query 'Instances[*].[InstanceId]' --output text)
           instance_public_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)
+          echo $instance_public_ip
       
-      - name: Pull artifacts from S3 bucket
-        run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
+      # - name: Pull artifacts from S3 bucket
+      #   run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
 
-      - name: copy artifacts to instance via ssh key
-        uses: appleboy/scp-action@master
-        with:
-          host: $instance_public_ip
-          username: ubuntu
-          key: ${{ secrets.KEY }}
-          source: 'medi-html.zip'
-          target: '/home/ubuntu'
+      # - name: copy artifacts to instance via ssh key
+      #   uses: appleboy/scp-action@master
+      #   with:
+      #     host: $instance_public_ip
+      #     username: ubuntu
+      #     key: ${{ secrets.KEY }}
+      #     source: 'medi-html.zip'
+      #     target: '/home/ubuntu'
 
-      - name: run commands on a remote server
-        uses: fifsky/ssh-action@master
-        with:
-          command: |
-            unzip medi-html.zip
-            cd medi-html
-            sudo cp -R ~/medi-html/* /var/www/html/
-          host: $instance_public_ip
-          user: ubuntu
-          key: ${{ secrets.KEY}}
+      # - name: run commands on a remote server
+      #   uses: fifsky/ssh-action@master
+      #   with:
+      #     command: |
+      #       unzip medi-html.zip
+      #       cd medi-html
+      #       sudo cp -R ~/medi-html/* /var/www/html/
+      #     host: $instance_public_ip
+      #     user: ubuntu
+      #     key: ${{ secrets.KEY}}
 
       # - name: Create AMI of instance
       #   run: ami_id=$(aws ec2 create-image --instance-id $instance_id --name "new-AMI" --description "new AMi with updated artifacts" --query ImageId --output text)
