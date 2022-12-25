@@ -12,7 +12,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
     outputs:
-      ip: ${{ steps.instance_ip.outputs.ec2-ip}}
+      ip: ${{ steps.instance_ip.outputs.ec2_ip}}
 
     steps:
       - name: Install awscli
@@ -33,7 +33,7 @@ jobs:
 
       - name: Store instance-ip in variable
         id: instance_ip
-        run: echo "::set-output name=ec2-ip::$instance_ip"
+        run: echo "::set-output name=ec2_ip::$instance_ip"
       
       - name: Pull artifacts from S3 bucket
         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
