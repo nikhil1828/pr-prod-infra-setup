@@ -46,6 +46,8 @@ jobs:
         uses: fifsky/ssh-action@master
         with:
           command: |
+            sudo apt update -y
+            sudo apt install unzip -y
             unzip medi-html.zip
             cd medi-html
             sudo cp -R ~/medi-html/* /var/www/html/
