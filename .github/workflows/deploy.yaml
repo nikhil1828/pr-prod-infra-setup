@@ -40,7 +40,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
-          target: '/home/ubuntu'
+          target: '/home/ubuntu/'
 
       - name: run commands on a remote server
         uses: fifsky/ssh-action@master
