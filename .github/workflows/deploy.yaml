@@ -38,7 +38,7 @@ jobs:
           echo "::set-output name=ec2-ip::$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)"
       
       - name: Pull artifacts from S3 bucket
-        run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip ~/medi-html.zip
+        run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip /home/runner/medi-html.zip
 
       - name: copy artifacts to instance via ssh key
         uses: appleboy/scp-action@master
@@ -46,8 +46,8 @@ jobs:
           host: ${{ steps.instance-ip.outputs.ec2-ip }}
           username: "ubuntu"
           key: ${{ secrets.KEY }}
-          source: "~/medi-html.zip"
-          target: "/home/ubuntu/medi-html.zip"
+          source: "/home/runner/medi-html.zip"
+          target: "/home/ubuntu/"
 
 
 
