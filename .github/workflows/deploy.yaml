@@ -33,10 +33,10 @@ jobs:
       #     instance_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)
       #     echo $instance_ip
 
-        - name: Store instance-ip in variable
-        run: |
-          aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text > ip.txt
-          echo ip.txt
+      - name: Store instance-ip in variable
+      run: |
+        aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text > ip.txt
+        echo ip.txt
 
       # - name: Store instance-ip in variable
       #   id: instance_ip
