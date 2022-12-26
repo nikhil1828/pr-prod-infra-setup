@@ -33,7 +33,7 @@ jobs:
           
       - name: Store instance-ip in variable
         run: |
-          instance_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query #'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)
+          instance_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)
           
       - name: print ip
         run: echo $instance_ip
@@ -43,9 +43,11 @@ jobs:
         run: echo -n "::set-output name=ec2_ip::$instance_ip"       #::set-output name=ec2_ip::
         
       - name: copy artifacts to instance via ssh key
+        env:
+          HOST: ${{ needs.job1.outputs.ip }}
         uses: appleboy/scp-action@master
         with:
-          host: ${{ needs.job1.outputs.ip }}
+          host: $HOST
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
