@@ -26,7 +26,7 @@ jobs:
           aws-region: ap-south-1
           
       - name: Store instance-id  in variable
-        run: instance_id=$(aws ec2 run-instances --image-id ami-0c9a52690acf91d95 --key-name mumbai-key --instance-type t2.micro --query 'Instances[*].[InstanceId]' --output text)
+        run: instance_id=$(aws ec2 run-instances --image-id ami-0c9a52690acf91d95 --key-name mumbai-key --instance-type t2.micro --query 'Instances[*].[InstanceId]' --output text) && sleep 50
           
       # - name: Store instance-ip in variable
       #   run: |
