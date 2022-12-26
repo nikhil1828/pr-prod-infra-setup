@@ -29,22 +29,24 @@ jobs:
         run: instance_id=$(aws ec2 run-instances --image-id ami-0c9a52690acf91d95 --key-name mumbai-key --instance-type t2.micro --query 'Instances[*].[InstanceId]' --output text)
           
       - name: Store instance-ip in variable
-        run: instance_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)
+        run: |
+        instance_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)
+        echo $instance_ip
 
-      - name: Store instance-ip in variable
-        id: instance_ip
-        run: echo "::set-output name=ec2_ip::$instance_ip"
+      # - name: Store instance-ip in variable
+      #   id: instance_ip
+      #   run: echo "::set-output name=ec2_ip::$instance_ip"
       
       - name: Pull artifacts from S3 bucket
         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
 
-      - name: print ip
-        run: echo ${{needs.job1.outputs.ip}}
+      # - name: print ip
+      #   run: echo ${{needs.job1.outputs.ip}}
         
       - name: copy artifacts to instance via ssh key
         uses: appleboy/scp-action@master
         with:
-          host: ${{ instance_ip }}
+          host: $instance_ip
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
