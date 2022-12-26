@@ -10,6 +10,7 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID:      ${{secrets.AWS_ACCESS_KEY_ID}} 
       AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      KEY:                    ${{ secrets.KEY }}
 
     outputs:
       output1: ${{ steps.instance_ip.outputs.test}}
@@ -47,8 +48,10 @@ jobs:
           cat instance_ip.txt
 
       - name: scp to ec2
-        run: |
-          scp -i ${{ secrets.KEY }} medi-html.zip ubuntu@$(cat instance_ip.txt):/home/ubuntu
+        run: scp -i ${{ secrets.KEY }} medi-html.zip ubuntu@$(cat instance_ip.txt):/home/ubuntu
+
+      - name: SSH into EC2 instance
+        run: ssh -i ${{ secrets.KEY }} ubuntu@$(cat instance_ip.txt)
         
       # - name: copy artifacts to instance via ssh key
       #   env:
