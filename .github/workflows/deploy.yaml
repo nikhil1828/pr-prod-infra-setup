@@ -41,7 +41,8 @@ jobs:
 
           aws ec2 describe-instances --instance-ids $(cat instance-id.txt) --query 'Reservations[*].Instances[*].PublicIpAddress' --output text  > publicip.txt
 
-          IPVAR='$(cat publicip.txt)'
+          IPVAR=$(cat publicip.txt)
+          export IPVAR
 
 
 
