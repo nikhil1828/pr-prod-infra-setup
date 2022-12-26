@@ -35,9 +35,10 @@ jobs:
         run: |
           aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text > ip.txt
 
+          cat ip.txt
+
           echo "IP=$(cat ip.txt)" >> $GITHUB_ENV
-          env
-          
+                    
       # - name: print ip
       #   run: echo ip.txt
 
