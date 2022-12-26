@@ -38,23 +38,31 @@ jobs:
       - name: Pull artifacts from S3 bucket
         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
 
-  job2:
-    runs-on: ubuntu-latest
-    env:
-      KEY: ${{ secrets.KEY }}
-    needs: job1
-    steps:
       - name: print ip
         run: echo ${{needs.job1.outputs.ip}}
-      # - name: copy artifacts to instance via ssh key
-      #   uses: appleboy/scp-action@master
-      #   with:
-      #     host: ${{needs.job1.outputs.ip}}
-      #     username: ubuntu
-      #     key: ${{ secrets.KEY }}
-      #     source: 'medi-html.zip'
-      #     port: 22
-      #     target: '/home/ubuntu/'
+        
+      - name: copy artifacts to instance via ssh key
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{needs.job1.outputs.ip}}
+          username: ubuntu
+          key: ${{ secrets.KEY }}
+          source: 'medi-html.zip'
+          port: 22
+          target: '/home/ubuntu/'
+  
+      - name: run commands on a remote server
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            sudo apt update -y
+            sudo apt install unzip -y
+            unzip medi-html.zip
+            cd medi-html
+            sudo cp -R ~/medi-html/* /var/www/html/
+          host: ${{needs.job1.outputs.ip}}
+          user: ubuntu
+          key: ${{ secrets.KEY}}
 
 
 
@@ -118,3 +126,8 @@ jobs:
       # - name: Create AMI of instance
       #   run: ami_id=$(aws ec2 create-image --instance-id $instance_id --name "new-AMI" --description "new AMi with updated artifacts" --query ImageId --output text)
 
+
+
+#aws ec2 create-image --instance-id i-0bec1602ac4ae0f85 --name new_updated_ami
+
+#
