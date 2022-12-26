@@ -63,7 +63,7 @@ jobs:
           IP: ${{ steps.setting_output.outputs.output1 }}
         uses: appleboy/scp-action@master
         with:
-          host: $IP
+          host: ${{env.IP}}
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
