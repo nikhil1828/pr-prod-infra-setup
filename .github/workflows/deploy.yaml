@@ -41,7 +41,7 @@ jobs:
 
           aws ec2 describe-instances --instance-ids $(cat instance-id.txt) --query 'Reservations[*].Instances[*].PublicIpAddress' --output text  > publicip.txt
 
-          ipvar=$(cat publicip.txt)
+          IPVAR='$(cat publicip.txt)'
 
 
 
@@ -59,7 +59,7 @@ jobs:
       - name: copy artifacts to instance via ssh key
         uses: appleboy/scp-action@master
         with:
-          host: $ipvar
+          host: ${{ env.IPVAR }}
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
