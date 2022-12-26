@@ -47,6 +47,11 @@ jobs:
 
           cat instance_ip.txt
 
+      - name: setting o/p
+        id : instance_ip
+        run: |
+          echo "::set-output name=test::$(cat instance_ip.txt)"
+
       # - name: scp to ec2
       #   run: scp -i ${{ secrets.KEY }} medi-html.zip ubuntu@$(cat instance_ip.txt):/home/ubuntu
 
@@ -54,11 +59,11 @@ jobs:
       #   run: ssh -i ${{ secrets.KEY }} ubuntu@$(cat instance_ip.txt)
         
       - name: copy artifacts to instance via ssh key
-        env:
-          IP: $(cat ip.txt)
+        env: 
+          IP: ${{ needs.job1.outputs.output1 }}
         uses: appleboy/scp-action@master
         with:
-          host: $(cat instance_ip.txt)
+          host: $Env:IP
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
