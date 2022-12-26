@@ -25,42 +25,25 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
           
-      # - name: Store instance-id  in variable
-      #   run: instance_id=$(aws ec2 run-instances --image-id ami-0c9a52690acf91d95 --key-name mumbai-key --instance-type t2.micro --query 'Instances[*].[InstanceId]' --output text) && sleep 50
+      - name: Store instance-id  in variable
+        run: instance_id=$(aws ec2 run-instances --image-id ami-0c9a52690acf91d95 --key-name mumbai-key --instance-type t2.micro --query 'Instances[*].[InstanceId]' --output text) && sleep 50
           
-      # - name: Store instance-ip in variable
-      #   run: |
-      #     instance_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query #'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)
-      #     echo $instance_ip
-
-      - name: creating Web EC2
+      - name: Store instance-ip in variable
         run: |
-          aws ec2 run-instances --image-id ami-0c9a52690acf91d95 --key-name mumbai-key --instance-type t2.micro |grep InstanceId > instance.txt
+          instance_ip=$(aws ec2 describe-instances --instance-ids $instance_id --query #'Reservations[*].Instances[*].[PublicIpAddress]'  --output text)
+          echo $instance_ip
 
-          awk '{print $2}' instance.txt | sed 's/"//g'|sed 's/,//g' > instance-id.txt
+      - name: Store instance-ip in variable
+        id: instance_ip
+        run: echo "::set-output name=ec2_ip::$instance_ip"       #::set-output name=ec2_ip::
 
-          aws ec2 describe-instances --instance-ids $(cat instance-id.txt) --query 'Reservations[*].Instances[*].PublicIpAddress' --output text  > publicip.txt
-
-          IPVAR=$(cat publicip.txt)
-          export IPVAR
-
-
-
-
-      # - name: Store instance-ip in variable
-      #   id: instance_ip
-      #   run: echo "::set-output name=ec2_ip::$instance_ip"
-      
       - name: Pull artifacts from S3 bucket
         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
-
-      - name: print ip
-        run: cat publicip.txt
         
       - name: copy artifacts to instance via ssh key
         uses: appleboy/scp-action@master
         with:
-          host: ${{ env.IPVAR }}
+          host: ${{ needs.job1.outputs.ip }}
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
