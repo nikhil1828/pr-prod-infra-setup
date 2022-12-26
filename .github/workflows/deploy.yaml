@@ -34,21 +34,24 @@ jobs:
       - name: Store instance-ip in variable
         run: |
           aws ec2 describe-instances --instance-ids $instance_id --query 'Reservations[*].Instances[*].[PublicIpAddress]'  --output text > ip.txt
-          
-      - name: print ip
-        run: echo ip.txt
 
-      - name: Create output of $instance-ip
-        id: instance_ip
-        run: |  
-          echo -n "::set-output name=test::ip.txt"
+          echo "IP=$(cat ip.txt)" >> $GITHUB_ENV
+          echo "${{env.IP}}"
+          
+      # - name: print ip
+      #   run: echo ip.txt
+
+      # - name: Create output of $instance-ip
+      #   id: instance_ip
+      #   run: |  
+      #     echo -n "::set-output name=test::ip.txt"
         
       - name: copy artifacts to instance via ssh key
         env:
           HOST: $(cat ip.txt)
         uses: appleboy/scp-action@master
         with:
-          host: $HOST
+          host: ${{env.IP}}
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
