@@ -47,23 +47,23 @@ jobs:
 
           cat instance_ip.txt
 
-      - name: scp to ec2
-        run: scp -i ${{ secrets.KEY }} medi-html.zip ubuntu@$(cat instance_ip.txt):/home/ubuntu
+      # - name: scp to ec2
+      #   run: scp -i ${{ secrets.KEY }} medi-html.zip ubuntu@$(cat instance_ip.txt):/home/ubuntu
 
-      - name: SSH into EC2 instance
-        run: ssh -i ${{ secrets.KEY }} ubuntu@$(cat instance_ip.txt)
+      # - name: SSH into EC2 instance
+      #   run: ssh -i ${{ secrets.KEY }} ubuntu@$(cat instance_ip.txt)
         
-      # - name: copy artifacts to instance via ssh key
-      #   env:
-      #     IP: $(cat ip.txt)
-      #   uses: appleboy/scp-action@master
-      #   with:
-      #     host: ${{ env.IP }}
-      #     username: ubuntu
-      #     key: ${{ secrets.KEY }}
-      #     source: 'medi-html.zip'
-      #     port: 22
-      #     target: '/home/ubuntu/'
+      - name: copy artifacts to instance via ssh key
+        env:
+          IP: $(cat ip.txt)
+        uses: appleboy/scp-action@master
+        with:
+          host: $(cat instance_ip.txt)
+          username: ubuntu
+          key: ${{ secrets.KEY }}
+          source: 'medi-html.zip'
+          port: 22
+          target: '/home/ubuntu/'
   
       # - name: run commands on a remote server
       #   uses: fifsky/ssh-action@master
