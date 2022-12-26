@@ -47,7 +47,7 @@ jobs:
 
           cat instance_ip.txt
 
-      - name: setting o/p
+      - name: setting_output
         id : instance_ip
         run: |
           echo "::set-output name=test::$(cat instance_ip.txt)"
@@ -60,10 +60,10 @@ jobs:
         
       - name: copy artifacts to instance via ssh key
         env: 
-          IP: ${{ needs.job1.outputs.output1 }}
+          IP: ${{ steps.setting_output.outputs.output1 }}
         uses: appleboy/scp-action@master
         with:
-          host: $Env:IP
+          host: $IP
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
