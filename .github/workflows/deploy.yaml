@@ -44,13 +44,13 @@ jobs:
       - name: Pull artifacts from S3 bucket
         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
 
-      # - name: print ip
-      #   run: echo ${{needs.job1.outputs.ip}}
+      - name: print ip
+        run: cat ip.txt
         
       - name: copy artifacts to instance via ssh key
         uses: appleboy/scp-action@master
         with:
-          host: $(ip.txt)
+          host: $(cat ip.txt)
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
