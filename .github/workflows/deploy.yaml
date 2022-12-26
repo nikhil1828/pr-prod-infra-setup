@@ -57,7 +57,7 @@ jobs:
       - name: copy artifacts to instance via ssh key
         uses: appleboy/scp-action@master
         with:
-          host: $(cat publicip.txt)
+          host: "$(cat publicip.txt)"
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
