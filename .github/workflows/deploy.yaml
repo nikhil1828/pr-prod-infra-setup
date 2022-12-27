@@ -154,11 +154,11 @@ jobs:
 
       - name: setting_output
         id : instance_ip
-        run: echo -n "::set-output name=test::$(cat instance_ip.txt)"
+        run: echo -n "::set-output name=test1::$(cat instance_ip.txt)"
 
       - name: take instanceid
         id: instance_id 
-        run: echo -n "::set-output name=test::$(cat instance_id.txt)"
+        run: echo -n "::set-output name=test2::$(cat instance_id.txt)"
 
       - name: testing
         run: echo "${{ needs.job1.outputs.output1 }}"
@@ -183,7 +183,7 @@ jobs:
             unzip medi-html.zip
             cd medi-html
             sudo cp -R ~/medi-html/* /var/www/html/
-          host: ${{ steps.instance_id.outputs.test }}
+          host: ${{ steps.instance_id.outputs.test1 }}
           user: ubuntu
           key: ${{ secrets.KEY}}
 
