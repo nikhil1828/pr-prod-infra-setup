@@ -169,7 +169,7 @@ jobs:
       - name: copy artifacts to instance via ssh key
         uses: appleboy/scp-action@master
         with:
-          host: ${{ steps.instance_id.outputs.test }}
+          host: ${{ steps.instance_ip.outputs.test1 }}
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
@@ -183,7 +183,7 @@ jobs:
             unzip medi-html.zip
             cd medi-html
             sudo cp -R ~/medi-html/* /var/www/html/
-          host: ${{ steps.instance_id.outputs.test1 }}
+          host: ${{ steps.instance_ip.outputs.test1 }}
           user: ubuntu
           key: ${{ secrets.KEY}}
 
