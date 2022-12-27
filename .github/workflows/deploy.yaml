@@ -50,14 +50,15 @@ jobs:
       - name: setting_output
         id : instance_ip
         run: |
-          echo "::set-output name=test::$(cat instance_ip.txt)"
+          echo -n "::set-output name=test::$(cat instance_ip.txt)"
        
       - name: copy artifacts to instance via ssh key
-        env: 
-          IP: ${{ steps.instance_ip.outputs.output1 }}
+        # env: 
+        #   IP: ${{ steps.instance_ip.outputs.output1 }}
         uses: appleboy/scp-action@master
         with:
-          host: ${{env.IP}}
+          host: ${{ steps.instance_ip.outputs.output1 }}
+          # host: ${{env.IP}}
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
