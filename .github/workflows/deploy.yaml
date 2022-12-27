@@ -109,7 +109,8 @@
 name: Deploy to AWS ASG
 
 on:
-  push: branches: test
+  push: 
+    branches: test
 
 jobs:
   job1:
