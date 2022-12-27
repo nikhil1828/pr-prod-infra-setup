@@ -1,7 +1,115 @@
+# name: Deploy to AWS ASG
+
+# on:
+#   workflow_dispatch:
+
+# jobs:
+#   job1:
+#     runs-on: ubuntu-latest
+
+#     env:
+#       AWS_ACCESS_KEY_ID:      ${{secrets.AWS_ACCESS_KEY_ID}} 
+#       AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
+#       KEY:                    ${{ secrets.KEY }}
+
+#     outputs:
+#       output1: ${{ steps.instance_ip.outputs.test}}
+#       output2: ${{ steps.instance_id.outputs.test}}
+
+#     steps:
+#       - name: Install awscli
+#         run: sudo apt install awscli -y
+
+#       - name: configure AWS
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-south-1
+          
+#       - name: Store instance-id  in variable
+#         run: |
+#           aws ec2 run-instances \
+#             --image-id ami-0c9a52690acf91d95 \
+#             --key-name mumbai-key \
+#             --instance-type t2.micro \
+#             --query 'Instances[0].[InstanceId]' \
+#             --output text > instance_id.txt
+          
+#       - name: Store instance-ip in variable
+#         run: |
+#           aws ec2 describe-instances \
+#             --instance-ids $(cat instance_id.txt) \
+#             --query 'Reservations[0].Instances[0].[PublicIpAddress]'  \
+#             --output text > instance_ip.txt
+
+#       - name: setting_output
+#         id : instance_ip
+#         run: echo -n "::set-output name=test::$(cat instance_ip.txt)"
+
+#       - name: take instanceid
+#         id: instance_id 
+#         run: echo -n "::set-output name=test::$(cat instance_id.txt)"
+       
+#   job2:
+#     runs-on: ubuntu-latest
+#     needs: job1
+#     env:
+#       AWS_ACCESS_KEY_ID:      ${{secrets.AWS_ACCESS_KEY_ID}} 
+#       AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
+#       KEY:                    ${{ secrets.KEY }}
+#     steps:
+#       - name: Install awscli
+#         run: sudo apt install awscli -y
+
+#       - name: configure AWS
+#         uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ap-south-1
+
+#       - name: testing
+#         run: echo "${{ needs.job1.outputs.output1 }}"
+
+#       - name: Pull artifacts from S3 bucket
+#         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
+
+#       - name: copy artifacts to instance via ssh key
+#         uses: appleboy/scp-action@master
+#         with:
+#           host: ${{ needs.job1.outputs.output1 }}
+#           username: ubuntu
+#           key: ${{ secrets.KEY }}
+#           source: 'medi-html.zip'
+#           port: 22
+#           target: '/home/ubuntu/'
+  
+#       - name: run commands on a remote server
+#         uses: fifsky/ssh-action@master
+#         with:
+#           command: |
+#             sudo apt install unzip -y
+#             unzip medi-html.zip
+#             cd medi-html
+#             sudo cp -R ~/medi-html/* /var/www/html/
+#           host: ${{ needs.job1.outputs.output1 }}
+#           user: ubuntu
+#           key: ${{ secrets.KEY}}
+
+#       - name: Create AMI of instance
+#         run: aws ec2 create-image --instance-id ${{ needs.job1.outputs.output2 }} --name "new-AMI" --description "new AMi with updated artifacts" --query ImageId --output text > ami_id.txt
+
+#       - name: Update/Create Launch Configuration
+#         run: aws ec2 create-launch-template-version --launch-template-name first-lc --source-version 1 --launch-template-data "ImageId=$(cat ami_id.txt)"
+      
+#       - name: Update ASG
+#         run:  aws autoscaling update-auto-scaling-group --auto-scaling-group-name test --launch-template LaunchTemplateName=first-lc,Version='$Latest'
+
 name: Deploy to AWS ASG
 
 on:
-  workflow_dispatch:
+  push: branches: test
 
 jobs:
   job1:
@@ -35,9 +143,6 @@ jobs:
             --instance-type t2.micro \
             --query 'Instances[0].[InstanceId]' \
             --output text > instance_id.txt
-
-      - name: Pull artifacts from S3 bucket
-        run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
           
       - name: Store instance-ip in variable
         run: |
@@ -46,8 +151,6 @@ jobs:
             --query 'Reservations[0].Instances[0].[PublicIpAddress]'  \
             --output text > instance_ip.txt
 
-          cat instance_ip.txt
-
       - name: setting_output
         id : instance_ip
         run: echo -n "::set-output name=test::$(cat instance_ip.txt)"
@@ -55,25 +158,6 @@ jobs:
       - name: take instanceid
         id: instance_id 
         run: echo -n "::set-output name=test::$(cat instance_id.txt)"
-       
-
-  job2:
-    runs-on: ubuntu-latest
-    needs: job1
-    env:
-      AWS_ACCESS_KEY_ID:      ${{secrets.AWS_ACCESS_KEY_ID}} 
-      AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
-      KEY:                    ${{ secrets.KEY }}
-    steps:
-      - name: Install awscli
-        run: sudo apt install awscli -y
-
-      - name: configure AWS
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1
 
       - name: testing
         run: echo "${{ needs.job1.outputs.output1 }}"
@@ -82,16 +166,12 @@ jobs:
         run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
 
       - name: copy artifacts to instance via ssh key
-        # env: 
-        #   IP: ${{ steps.instance_ip.outputs.output1 }}
         uses: appleboy/scp-action@master
         with:
-          host: ${{ needs.job1.outputs.output1 }}
-          # host: ${{env.IP}}
+          host: ${{ steps.instance_id.outputs.test }}
           username: ubuntu
           key: ${{ secrets.KEY }}
           source: 'medi-html.zip'
-          port: 22
           target: '/home/ubuntu/'
   
       - name: run commands on a remote server
@@ -102,42 +182,16 @@ jobs:
             unzip medi-html.zip
             cd medi-html
             sudo cp -R ~/medi-html/* /var/www/html/
-          host: ${{ needs.job1.outputs.output1 }}
+          host: ${{ steps.instance_id.outputs.test }}
           user: ubuntu
           key: ${{ secrets.KEY}}
 
-      - name: Create AMI of instance
-        run: aws ec2 create-image --instance-id ${{ needs.job1.outputs.output2 }} --name "new-AMI" --description "new AMi with updated artifacts" --query ImageId --output text > ami_id.txt
+      # - name: Create AMI of instance
+      #   run: aws ec2 create-image --instance-id ${{ needs.job1.outputs.output2 }} --name "new-AMI" --description "new AMi with updated artifacts" --query ImageId --output text > ami_id.txt
 
-      - name: Update/Create Launch Configuration
-        run: aws ec2 create-launch-template-version --launch-template-name first-lc --source-version 1 --launch-template-data "ImageId=$(cat ami_id.txt)"
+      # - name: Update/Create Launch Configuration
+      #   run: aws ec2 create-launch-template-version --launch-template-name first-lc --source-version 1 --launch-template-data "ImageId=$(cat ami_id.txt)"
       
-      - name: Update ASG
-        run:  aws autoscaling update-auto-scaling-group --auto-scaling-group-name test --launch-template LaunchTemplateName=first-lc,Version='$Latest'
+      # - name: Update ASG
+      #   run:  aws autoscaling update-auto-scaling-group --auto-scaling-group-name test --launch-template LaunchTemplateName=first-lc,Version='$Latest'
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#aws ec2 create-image --instance-id i-0bec1602ac4ae0f85 --name new_updated_ami
-
-#
