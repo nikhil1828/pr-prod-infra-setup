@@ -61,9 +61,22 @@ jobs:
       AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
       KEY:                    ${{ secrets.KEY }}
     steps:
+      - name: Install awscli
+        run: sudo apt install awscli -y
+
+      - name: configure AWS
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+          
       - name: testing
         run: echo "${{ needs.job1.outputs.output1 }}"
-        
+
+      - name: Pull artifacts from S3 bucket
+        run: aws s3 cp s3://bucket-for-tfstate-remote/medi-html.zip medi-html.zip
+
       - name: copy artifacts to instance via ssh key
         # env: 
         #   IP: ${{ steps.instance_ip.outputs.output1 }}
