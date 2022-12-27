@@ -122,8 +122,8 @@ jobs:
       KEY:                    ${{ secrets.KEY }}
 
     outputs:
-      output1: ${{ steps.instance_ip.outputs.test}}
-      output2: ${{ steps.instance_id.outputs.test}}
+      output1: ${{ steps.instance_ip.outputs.test1}}
+      output2: ${{ steps.instance_id.outputs.test2}}
 
     steps:
       - name: Install awscli
