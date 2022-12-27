@@ -110,7 +110,30 @@ jobs:
         run: aws ec2 create-image --instance-id ${{ needs.job1.outputs.output2 }} --name "new-AMI" --description "new AMi with updated artifacts" --query ImageId --output text > ami_id.txt
 
       - name: Update/Create Launch Configuration
-        run: aws autoscaling create-launch-configuration --launch-configuration-name first-lc --new-launch-configuration-name new-first-lc --image-id $(cat ami_id.txt)
+        run: aws ec2 create-launch-template-version --launch-template-name first-lc --source-version 1 --launch-template-data "ImageId=$(cat ami_id.txt)"
+      
+      - name: Update ASG
+        run:  aws autoscaling update-auto-scaling-group --auto-scaling-group-name test --launch-template LaunchTemplateName=first-lc,Version='$Latest'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
