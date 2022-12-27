@@ -14,6 +14,7 @@ jobs:
 
     outputs:
       output1: ${{ steps.instance_ip.outputs.test}}
+      output2: ${{ steps.instance_ip.outputs.id}}
 
     steps:
       - name: Install awscli
@@ -51,6 +52,7 @@ jobs:
         id : instance_ip
         run: |
           echo -n "::set-output name=test::$(cat instance_ip.txt)"
+          echo -n "::set-output name=id::$(cat instance_id.txt)"
        
 
   job2:
@@ -70,7 +72,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
-          
+
       - name: testing
         run: echo "${{ needs.job1.outputs.output1 }}"
 
@@ -90,106 +92,25 @@ jobs:
           port: 22
           target: '/home/ubuntu/'
   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      # - name: run commands on a remote server
-      #   uses: fifsky/ssh-action@master
-      #   with:
-      #     command: |
-      #       sudo apt update -y
-      #       sudo apt install unzip -y
-      #       unzip medi-html.zip
-      #       cd medi-html
-      #       sudo cp -R ~/medi-html/* /var/www/html/
-      #     host: ${{ env.IP }}
-      #     user: ubuntu
-      #     key: ${{ secrets.KEY}}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      # - name: Create AMI of instance
-      #   run: ami_id=$(aws ec2 create-image --instance-id $instance_id --name "new-AMI" --description "new AMi with updated artifacts" --query ImageId --output text)
-
+      - name: run commands on a remote server
+        uses: fifsky/ssh-action@master
+        with:
+          command: |
+            sudo apt install unzip -y
+            unzip medi-html.zip
+            cd medi-html
+            sudo cp -R ~/medi-html/* /var/www/html/
+          host: ${{ needs.job1.outputs.output1 }}
+          user: ubuntu
+          key: ${{ secrets.KEY}}
+
+      - name: Create AMI of instance
+        run: aws ec2 create-image --instance-id ${{ needs.job1.outputs.output2 }} --name "new-AMI" --description "new AMi with updated artifacts" --query ImageId --output text > ami_id.txt
+
+      - name: Update/Create Launch Configuration
+        run: aws autoscaling create-launch-configuration --launch-configuration-name first-lc --new-launch-configuration-name new-first-lc --image-id $(cat ami_id.txt)
+
+        
 
 
 #aws ec2 create-image --instance-id i-0bec1602ac4ae0f85 --name new_updated_ami
