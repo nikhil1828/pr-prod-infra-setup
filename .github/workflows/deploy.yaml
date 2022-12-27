@@ -14,7 +14,7 @@ jobs:
 
     outputs:
       output1: ${{ steps.instance_ip.outputs.test}}
-      output2: ${{ steps.instance_ip.outputs.id}}
+      output2: ${{ steps.instance_id.outputs.test}}
 
     steps:
       - name: Install awscli
@@ -50,9 +50,11 @@ jobs:
 
       - name: setting_output
         id : instance_ip
-        run: |
-          echo -n "::set-output name=test::$(cat instance_ip.txt)"
-          echo -n "::set-output name=id::$(cat instance_id.txt)"
+        run: echo -n "::set-output name=test::$(cat instance_ip.txt)"
+
+      - name: take instanceid
+        id: instance_id 
+        run: echo -n "::set-output name=test::$(cat instance_id.txt)"
        
 
   job2:
@@ -110,7 +112,7 @@ jobs:
       - name: Update/Create Launch Configuration
         run: aws autoscaling create-launch-configuration --launch-configuration-name first-lc --new-launch-configuration-name new-first-lc --image-id $(cat ami_id.txt)
 
-        
+
 
 
 #aws ec2 create-image --instance-id i-0bec1602ac4ae0f85 --name new_updated_ami
